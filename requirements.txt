@@ -1,6 +1,7 @@
 ipython==8.22.2
 streamlit==1.32.2
 transformers==4.32.0
+libpq-dev
 psycopg2-binary
 timescale-vector==0.0.4
 llama-index==0.10.24
