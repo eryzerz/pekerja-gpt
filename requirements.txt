@@ -12,3 +12,5 @@ llama-index-readers-llama-parse==0.1.4
 ipython==8.22.2
 streamlit==1.32.2
 transformers==4.32.0
+psycopg2==2.9.9
+psycopg2-binary==2.9.9
