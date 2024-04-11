@@ -1,8 +1,8 @@
 ipython==8.22.2
 streamlit==1.32.2
 transformers==4.32.0
-libpq-dev
-psycopg2-binary
+sqlalchemy==2.0.29
+psycopg2-binary==2.9.9
 timescale-vector==0.0.4
 llama-index==0.10.24
 llama-index-embeddings-adapter==0.1.3
