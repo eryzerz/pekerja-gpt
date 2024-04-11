@@ -6,7 +6,6 @@ from llama_index.embeddings.openai import OpenAIEmbedding
 from llama_index.llms.openai import OpenAI
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, Settings, StorageContext
 from llama_index.core.node_parser import SentenceWindowNodeParser
-from llama_index.vector_stores.timescalevector import TimescaleVectorStore
 from llama_index.core.postprocessor import MetadataReplacementPostProcessor
 from llama_index.core.response_synthesizers import Refine, get_response_synthesizer
 from llama_index.core.prompts import PromptTemplate
