@@ -15,13 +15,15 @@ from llama_index.core.evaluation import EmbeddingQAFinetuneDataset
 from llama_index.core.embeddings import resolve_embed_model
 from llama_index.embeddings.adapter.utils import TwoLayerNN
 from llama_index.llms.anthropic import Anthropic
+from pinecone import Pinecone
+from llama_index.vector_stores.pinecone import PineconeVectorStore
 
 documents_file = ["./uu_no_13_th_2003.pdf", "./uu_13_explained.pdf"]
 pp = pprint.PrettyPrinter(indent=4)
 
 
 def initialize_index(file):
-    # llm = OpenAI(model="gpt-3.5-turbo", temperature=0.1, api_key=st.secrets.openai.api_key)
+    # llm = OpenAI(model="gpt-4-turbo-preview", temperature=0.1, api_key=st.secrets.openai.api_key)
     llm = Anthropic(model="claude-3-sonnet-20240229", api_key=st.secrets.anthropic.api_key, max_tokens=4096, temperature=0)
     dataset = EmbeddingQAFinetuneDataset.from_json("uu13_dataset.json")
     
@@ -54,6 +56,9 @@ def initialize_index(file):
 
     Settings.llm = llm
     Settings.embed_model = embed_model
+    
+    pc = Pinecone(api_key=st.secrets.pinecone.api_key)
+    pc_index = pc.Index("uu13")
 
     ## ==> INITIAL STORING EMBEDDING TO VECTOR DB start 
     # node_parser = SentenceWindowNodeParser.from_defaults(
@@ -61,10 +66,8 @@ def initialize_index(file):
     #     window_metadata_key="window",
     #     original_text_metadata_key="original_text",
     # )
-    # vector_store = TimescaleVectorStore.from_params(
-    #     service_url=st.secrets.pg.connection_string,
-    #     table_name=st.secrets.pg.table_name,
-    #     num_dimensions=384
+    # vector_store = PineconeVectorStore(
+    #     pinecone_index=pc_index
     # )
     # documents = SimpleDirectoryReader(
     #     input_files=file
@@ -75,10 +78,8 @@ def initialize_index(file):
     # index = VectorStoreIndex(nodes, storage_context=storage_context)
     ## ==>  INITIAL STORING EMBEDDING TO VECTORDB end
     
-    vector_store = TimescaleVectorStore.from_params(
-        service_url=st.secrets.pg.connection_string,
-        table_name=st.secrets.pg.table_name,
-        num_dimensions=384
+    vector_store = PineconeVectorStore(
+        pinecone_index=pc_index
     )
     index = VectorStoreIndex.from_vector_store(vector_store=vector_store)
 
