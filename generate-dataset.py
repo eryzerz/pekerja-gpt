@@ -1,12 +1,12 @@
 import json
 import os
+import streamlit as st
 from llama_index.llms.openai import OpenAI
 from llama_index.core import SimpleDirectoryReader
 from llama_index.finetuning import generate_qa_embedding_pairs
 from llama_index.core.node_parser import SentenceWindowNodeParser
 
 files = ["./uu_no_13_th_2003.pdf", "./uu_13_explained.pdf"]
-os.environ["OPENAI_API_KEY"] = "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"
 
 def main():
 
@@ -52,7 +52,7 @@ def main():
     """
 
   train_dataset = generate_qa_embedding_pairs(
-    llm=OpenAI(model="gpt-4-turbo-preview"),
+    llm=OpenAI(model="gpt-4-turbo-preview", api_key=st.secrets.openai.api_key),
     nodes=train_nodes,
     qa_generate_prompt_tmpl=qa_generate_prompt_tmpl,
     num_questions_per_chunk=12

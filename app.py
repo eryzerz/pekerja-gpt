@@ -21,7 +21,7 @@ pp = pprint.PrettyPrinter(indent=4)
 
 
 def initialize_index(file):
-    llm = OpenAI(model="gpt-3.5-turbo", temperature=0.1, api_key=st.secrets.openai.api_key)
+    # llm = OpenAI(model="gpt-3.5-turbo", temperature=0.1, api_key=st.secrets.openai.api_key)
     llm = Anthropic(model="claude-3-sonnet-20240229", api_key=st.secrets.anthropic.api_key, max_tokens=4096, temperature=0)
     dataset = EmbeddingQAFinetuneDataset.from_json("uu13_dataset.json")
     
