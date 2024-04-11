@@ -17,14 +17,12 @@ from llama_index.embeddings.adapter.utils import TwoLayerNN
 from llama_index.llms.anthropic import Anthropic
 
 documents_file = ["./uu_no_13_th_2003.pdf", "./uu_13_explained.pdf"]
-os.environ["OPENAI_API_KEY"] = st.secrets.openai.api_key
-os.environ["ANTHROPIC_API_KEY"] = st.secrets.anthropic.api_key
 pp = pprint.PrettyPrinter(indent=4)
 
 
 def initialize_index(file):
-    # llm = OpenAI(model="gpt-3.5-turbo", temperature=0.1)
-    llm = Anthropic(model="claude-3-sonnet-20240229", max_tokens=4096, temperature=0)
+    llm = OpenAI(model="gpt-3.5-turbo", temperature=0.1, api_key=st.secrets.openai.api_key)
+    llm = Anthropic(model="claude-3-sonnet-20240229", api_key=st.secrets.anthropic.api_key, max_tokens=4096, temperature=0)
     dataset = EmbeddingQAFinetuneDataset.from_json("uu13_dataset.json")
     
     base_embed_model = resolve_embed_model("local:BAAI/bge-small-en")
