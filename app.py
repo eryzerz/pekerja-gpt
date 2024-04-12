@@ -16,6 +16,13 @@ from llama_index.embeddings.adapter.utils import TwoLayerNN
 from llama_index.llms.anthropic import Anthropic
 from pinecone import Pinecone
 from llama_index.vector_stores.pinecone import PineconeVectorStore
+from llama_index.embeddings.huggingface import HuggingFaceEmbedding
+
+# loads BAAI/bge-small-en
+# embed_model = HuggingFaceEmbedding()
+
+# loads BAAI/bge-small-en-v1.5
+embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en-v1.5")
 
 documents_file = ["./uu_no_13_th_2003.pdf", "./uu_13_explained.pdf"]
 pp = pprint.PrettyPrinter(indent=4)
@@ -77,7 +84,7 @@ def initialize_index(file):
     
     ## ==> LOAD FINETUNED EMBEDDING start
     llm = Anthropic(model="claude-3-sonnet-20240229", api_key=st.secrets.anthropic.api_key, max_tokens=4096, temperature=0)
-    embed_model = resolve_embed_model("local:BAAI/bge-small-en")
+    embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en")
 
     Settings.llm = llm
     Settings.embed_model = embed_model
