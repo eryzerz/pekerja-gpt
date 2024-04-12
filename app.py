@@ -84,8 +84,30 @@ def initialize_index(file):
     
     ## ==> LOAD FINETUNED EMBEDDING start
     llm = Anthropic(model="claude-3-sonnet-20240229", api_key=st.secrets.anthropic.api_key, max_tokens=4096, temperature=0)
-    embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en")
+    dataset = EmbeddingQAFinetuneDataset.from_json("uu13_dataset.json")
+    base_embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en")
+    adapter_model = TwoLayerNN(
+        384,
+        1024,
+        384,
+        bias=True,
+        add_residual=True,
+    )
 
+    finetune_engine = EmbeddingAdapterFinetuneEngine(
+        dataset,
+        base_embed_model,
+        model_output_path="model5_output_test",
+        model_checkpoint_path="model5_ck",
+        adapter_model=adapter_model,
+        epochs=5,
+        verbose=True,
+        dim=384
+    )
+
+    embed_model = finetune_engine.get_finetuned_model(
+        adapter_cls=TwoLayerNN
+    )
     Settings.llm = llm
     Settings.embed_model = embed_model
     
