@@ -18,78 +18,18 @@ from pinecone import Pinecone
 from llama_index.vector_stores.pinecone import PineconeVectorStore
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 
-# loads BAAI/bge-small-en
-# embed_model = HuggingFaceEmbedding()
-
-# loads BAAI/bge-small-en-v1.5
-embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en-v1.5")
-
 documents_file = ["./uu_no_13_th_2003.pdf", "./uu_13_explained.pdf"]
 pp = pprint.PrettyPrinter(indent=4)
 
 
 def initialize_index(file):
-    ## ==> FINETUNING start
-    # llm = OpenAI(model="gpt-4-turbo-preview", temperature=0.1, api_key=st.secrets.openai.api_key)
-    # dataset = EmbeddingQAFinetuneDataset.from_json("uu13_dataset.json")
-    # base_embed_model = resolve_embed_model("local:BAAI/bge-small-en")
-    # adapter_model = TwoLayerNN(
-    #     384,
-    #     1024,
-    #     384,
-    #     bias=True,
-    #     add_residual=True,
-    # )
-
-    # finetune_engine = EmbeddingAdapterFinetuneEngine(
-    #     dataset,
-    #     base_embed_model,
-    #     model_output_path="model5_output_test",
-    #     model_checkpoint_path="model5_ck",
-    #     adapter_model=adapter_model,
-    #     epochs=5,
-    #     verbose=True,
-    #     dim=384
-    # )
-
-    # finetune_engine.finetune()
-
-    # embed_model = finetune_engine.get_finetuned_model(
-    #     adapter_cls=TwoLayerNN
-    # )
-
-    # Settings.llm = llm
-    # Settings.embed_model = embed_model
-    
-    # pc = Pinecone(api_key=st.secrets.pinecone.api_key)
-    # pc_index = pc.Index("uu13")
-
-    # node_parser = SentenceWindowNodeParser.from_defaults(
-    #     window_size=8,
-    #     window_metadata_key="window",
-    #     original_text_metadata_key="original_text",
-    # )
-    # vector_store = PineconeVectorStore(
-    #     pinecone_index=pc_index
-    # )
-    # documents = SimpleDirectoryReader(
-    #     input_files=file
-    # ).load_data()
-    # nodes = node_parser.get_nodes_from_documents(documents)
-    # storage_context = StorageContext.from_defaults(vector_store=vector_store)
-
-    # index = VectorStoreIndex(nodes, storage_context=storage_context)
-    ## ==>  FINETUNING end
-    
-    
-    ## ==> LOAD FINETUNED EMBEDDING start
     llm = Anthropic(model="claude-3-sonnet-20240229", api_key=st.secrets.anthropic.api_key, max_tokens=4096, temperature=0)
     dataset = EmbeddingQAFinetuneDataset.from_json("uu13_dataset.json")
-    base_embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en")
+    base_embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-m3")
     adapter_model = TwoLayerNN(
-        384,
         1024,
-        384,
+        8194,
+        1024,
         bias=True,
         add_residual=True,
     )
@@ -102,7 +42,7 @@ def initialize_index(file):
         adapter_model=adapter_model,
         epochs=5,
         verbose=True,
-        dim=384
+        dim=1024
     )
 
     embed_model = finetune_engine.get_finetuned_model(
@@ -118,8 +58,6 @@ def initialize_index(file):
         pinecone_index=pc_index
     )
     index = VectorStoreIndex.from_vector_store(vector_store=vector_store)
-    ## ==> LOAD FINETUNED EMBEDDING end
-    
     
     return index
 
@@ -143,7 +81,7 @@ def query_index(query_text):
         "---------------------\n"
         "Jawablah berdasarkan konteks.\n"
         "Jawablah dengan teliti, karena anda akan memperoleh hadiah jutaan rupiah apabila menjawab dengan tepat.\n"
-        "Apabila ada perhitungan, hitunglah dengan teliti jika anda ingin memperoleh hadiah jutaan rupiah.\n"
+        "Perhatikan dan analisis dengan teliti, apabila terdapat pernyataan matematis seperti: lebih dari, kurang dari, atau sejenisnya, jika anda ingin memperoleh hadiah milyaran rupiah\n"
         "Pertanyaan: {query_str}\n"
         "Jawaban: "
     )
@@ -163,7 +101,7 @@ def query_index(query_text):
         "Dengan konteks baru tersebut, ubahlah jawaban awal agar lebih sesuai untuk menjawaban pertanyaan. Jika konteks tidak berguna, gunakan jawaban awal.\n"
         "Tidak perlu menyisipkan alasan dari perbaikan jawaban, cukup tampilkan jawaban terakhir.\n"
         "Apabila anda dapat menjawab dengan teliti, tanpa ada terminologi yang keliru, anda akan memperoleh hadiah jutaan rupiah.\n"
-        "Apabila ada perhitungan, hitunglah dengan teliti jika anda ingin memperoleh hadiah jutaan rupiah.\n"
+        "Perhatikan dan analisis dengan teliti, apabila terdapat pernyataan matematis seperti: lebih dari, kurang dari, atau sejenisnya, jika anda ingin memperoleh hadiah milyaran rupiah\n"
         "Jawaban Baru: "
     )
     refine_prompt_tmpl = PromptTemplate(refine_prompt_tmpl_str)
