@@ -1,1 +1,1 @@
-{"in_features": 384, "hidden_features": 1024, "out_features": 384, "bias": true, "activation_fn_str": "relu", "add_residual": true}
+{"in_features": 1024, "hidden_features": 8194, "out_features": 1024, "bias": true, "activation_fn_str": "relu", "add_residual": true}
