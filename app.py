@@ -21,7 +21,7 @@ from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 documents_file = ["./uu_no_13_th_2003.pdf", "./uu_13_explained.pdf"]
 pp = pprint.PrettyPrinter(indent=4)
 
-
+@st.cache_resource
 def initialize_index(file):
     llm = Anthropic(model="claude-3-sonnet-20240229", api_key=st.secrets.anthropic.api_key, max_tokens=4096, temperature=0)
     dataset = EmbeddingQAFinetuneDataset.from_json("uu13_dataset.json")
