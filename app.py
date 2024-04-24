@@ -18,13 +18,13 @@ from llama_index.vector_stores.pinecone import PineconeVectorStore
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.postprocessor.cohere_rerank import CohereRerank
 
-documents_file = ["./uu_no_13_th_2003.pdf", "./uu_13_explained.pdf"]
+documents_file = ["./uu_no_13_th_2003.pdf"]
 pp = pprint.PrettyPrinter(indent=4)
 
 @st.cache_resource
 def initialize_index(file):
+    llm = OpenAI(model="gpt-3.5-turbo", temperature=0.1, api_key=st.secrets.openai.api_key)
     ## ==> FINETUNE EMBEDDING start
-    # llm = OpenAI(model="gpt-4-turbo-preview", temperature=0.1, api_key=st.secrets.openai.api_key)
     # dataset = EmbeddingQAFinetuneDataset.from_json("uu13_dataset.json")
     # base_embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-m3")
     # adapter_model = TwoLayerNN(
@@ -77,7 +77,7 @@ def initialize_index(file):
     
     
     ## ==> LOAD FINETUNED EMBEDDING start
-    llm = Anthropic(model="claude-3-sonnet-20240229", api_key=st.secrets.anthropic.api_key, max_tokens=4096, temperature=0)
+    # llm = Anthropic(model="claude-3-sonnet-20240229", api_key=st.secrets.anthropic.api_key, max_tokens=4096, temperature=0)
     dataset = EmbeddingQAFinetuneDataset.from_json("uu13_dataset.json")
     base_embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-m3")
     adapter_model = TwoLayerNN(
@@ -200,7 +200,7 @@ def query_index(query_text):
 
 st.title("PekerjaGPT 🚩")
 
-text = st.text_area("Query text:", value="Secara detail, sanksi seperti apa yang dapat dikenakan apabila pengusaha tidak membayar upah lembur?")
+text = st.text_area("Tanya:", placeholder="Secara detail, sanksi seperti apa yang dapat dikenakan apabila pengusaha tidak membayar upah lembur?")
 
 if st.button("Submit") and text is not None:
     response = query_index(text)

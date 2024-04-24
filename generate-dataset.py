@@ -6,7 +6,7 @@ from llama_index.core import SimpleDirectoryReader
 from llama_index.finetuning import generate_qa_embedding_pairs
 from llama_index.core.node_parser import SentenceWindowNodeParser
 
-files = ["./uu_no_13_th_2003.pdf", "./uu_13_explained.pdf"]
+files = ["./uu_no_13_th_2003.pdf"]
 
 def main():
 
@@ -52,13 +52,13 @@ def main():
     """
 
   train_dataset = generate_qa_embedding_pairs(
-    llm=OpenAI(model="gpt-4-turbo-preview", api_key=st.secrets.openai.api_key),
+    llm=OpenAI(model="gpt-3.5-turbo", api_key=st.secrets.openai.api_key),
     nodes=train_nodes,
     qa_generate_prompt_tmpl=qa_generate_prompt_tmpl,
     num_questions_per_chunk=12
   )
 
-  train_dataset.save_json("uu13_dataset_v2.json")
+  train_dataset.save_json("uu13_dataset.json")
 
 if __name__ == "__main__":
     main()
