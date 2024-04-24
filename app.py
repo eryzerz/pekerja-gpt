@@ -16,6 +16,7 @@ from llama_index.llms.anthropic import Anthropic
 from pinecone import Pinecone
 from llama_index.vector_stores.pinecone import PineconeVectorStore
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
+from llama_index.postprocessor.cohere_rerank import CohereRerank
 
 documents_file = ["./uu_no_13_th_2003.pdf", "./uu_13_explained.pdf"]
 pp = pprint.PrettyPrinter(indent=4)
@@ -135,10 +136,11 @@ def query_index(query_text):
         "2. Perhatikan pertanyaan dengan teliti, apabila dalam pertanyaan tidak ada kaitannya dengan kelalaian pekerja, jangan berasumsi bahwa dasar dari pertanyaan karena adanya kelalaian dari pekerja.\n"
         "3. Perhatikan dengan teliti bahwa istilah/terminologi berikut memiliki makna yang berbeda: upah, upah minimum, upah kerja lembur, uang pesangon, uang penghargaan masa kerja, dan uang penggantian hak.\n"
         "4. Perhatikan dengan teliti setiap istilah/terminologi, jangan sampai tertukar!\n"
-        "5. Perhatikan dan analisis dengan teliti, apabila terdapat pernyataan matematis seperti: lebih dari, kurang dari, lebih tetapi kurang dari, atau sejenisnya.\n"
+        "5. Perhatikan dengan teliti, apabila terdapat pernyataan matematis seperti: lebih dari, kurang dari, lebih tetapi kurang dari, atau sejenisnya.\n"
         "6. Tidak perlu menambahkan jawaban yang tidak sesuai dengan pertanyaan. Contoh, apabila ditanya mengenai pesangon, tidak perlu menambahkan jawaban mengenai upah penggantian hak.\n"
+        "7. Jangan mengawali jawaban dengan, 'Berdasarkan konteks yang diberikan' atau sejenisnya.\n"
         "Perhatikan dan pertimbangkan seluruh kriteria dengan baik, karena akan diujikan nanti.\n"
-        "Apabila anda dapat memenuhi kriteria-kriteria tersebut dan menghasilkan jawaban denganh baik, maka anda akan memperoleh hadiah milyaran rupiah.\n"
+        "Apabila anda dapat memenuhi kriteria-kriteria tersebut dan menghasilkan jawaban dengan baik, maka anda akan memperoleh hadiah milyaran rupiah.\n"
         "Jawablah pertanyaan di bawah dengan teliti, karena anda akan memperoleh hadiah jutaan rupiah apabila menjawab dengan tepat.\n"
         "Pertanyaan: {query_str}\n"
         "Jawaban: "
@@ -159,7 +161,7 @@ def query_index(query_text):
         "2. Perhatikan pertanyaan dengan teliti, apabila dalam pertanyaan tidak ada kaitannya dengan kelalaian pekerja, jangan berasumsi bahwa dasar dari pertanyaan karena adanya kelalaian dari pekerja.\n"
         "3. Perhatikan dengan teliti bahwa istilah/terminologi berikut memiliki makna yang berbeda: upah, upah minimum, upah kerja lembur, uang pesangon, uang penghargaan masa kerja, dan uang penggantian hak.\n"
         "4. Perhatikan dengan teliti setiap istilah/terminologi, jangan sampai tertukar!\n"
-        "5. Perhatikan dan analisis dengan teliti, apabila terdapat pernyataan matematis seperti: lebih dari, kurang dari, lebih tetapi kurang dari, atau sejenisnya.\n"
+        "5. Perhatikan dengan teliti, apabila terdapat pernyataan matematis seperti: lebih dari, kurang dari, lebih tetapi kurang dari, atau sejenisnya.\n"
         "6. Tidak perlu menambahkan jawaban yang tidak sesuai dengan pertanyaan. Contoh, apabila ditanya mengenai pesangon, tidak perlu menambahkan jawaban mengenai upah penggantian hak.\n"
         "7. Tidak perlu menyisipkan alasan dari perbaikan jawaban, cukup tampilkan jawaban terakhir.\n"
         "Perhatikan dan pertimbangkan seluruh kriteria dengan baik, karena akan diujikan nanti.\n"
@@ -173,11 +175,13 @@ def query_index(query_text):
     if _index is None:
         return "Please initialize the index!"
     
+    cohere_rerank = CohereRerank(api_key=st.secrets.cohere.api_key, top_n=3)
     response_synthesizer = get_response_synthesizer(response_mode="refine")
     query_engine = _index.as_query_engine(
-        similarity_top_k=5,
+        similarity_top_k=8,
         node_postprocessors=[
-            MetadataReplacementPostProcessor(target_metadata_key="window")
+            MetadataReplacementPostProcessor(target_metadata_key="window"),
+            cohere_rerank
         ],
         response_synthesizer=response_synthesizer,
     )
